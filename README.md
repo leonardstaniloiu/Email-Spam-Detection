@@ -75,7 +75,7 @@ matplotlib
 ### Running the Application
 
 ```bash
-streamlit run spam_detector_avansat.py
+streamlit run app.py
 ```
 OR
 ```bash
