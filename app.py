@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-
 from spam_service import (
     generate_random_email,
     load_data,
@@ -31,7 +30,6 @@ def main():
     
     with st.spinner("Training all models... This may take a moment!"):
         vectorizer, results, df, X_test, y_test = train_all_models(data_path)
-    
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -79,7 +77,7 @@ def main():
                 label_visibility="collapsed"
             )
             
-        if st.button(" Analyze email", type="primary", use_container_width=False):
+        if st.button(" Analyze email", type="primary"):
             if email_text.strip():
                 model = results[model_choice]["model"]
                 prediction, probability = predict_email(email_text, vectorizer, model)
@@ -130,7 +128,6 @@ def main():
                 "F1-Score": "{:.2%}",
                 "Training time in seconds": "{:.2f}"
             }).background_gradient(subset=["Accuracy"], cmap="RdYlGn"),
-            use_container_width=True,
             hide_index=True
         )
         
@@ -147,7 +144,7 @@ def main():
                 color_continuous_scale="RdYlGn"
             )
             fig1.update_layout(showlegend=False)
-            st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig1)
         
         with col2:
             fig2 = px.bar(
@@ -159,7 +156,7 @@ def main():
                 color="Training time in seconds",
                 color_continuous_scale="Blues"
             )
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2)
         
         fig3 = px.scatter(
             comp_df,
@@ -172,7 +169,7 @@ def main():
             size_max=30
         )
         fig3.update_traces(textposition='top center')
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3)
     
     with tab3:
         st.subheader("Confusion Matrix")
@@ -198,7 +195,7 @@ def main():
                     height=300
                 )
                 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig)
    
 if __name__ == "__main__":
     main()

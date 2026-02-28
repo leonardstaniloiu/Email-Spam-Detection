@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -15,15 +16,27 @@ import streamlit as st
 
 @st.cache_data
 def load_data(path: str):
-    df = pd.read_csv(path)
+    try:
+        df = pd.read_csv(path, on_bad_lines='skip', engine='python')
+    except Exception as e:
+        st.error(f"Error loading CSV: {e}")
+        return pd.DataFrame()
+
     df.columns = [col.strip().lower() for col in df.columns]
 
+    if "category" not in df.columns or "message" not in df.columns:
+        st.error("Dataset-ul trebuie să conțină coloanele 'category' și 'message'!")
+        return pd.DataFrame()
+
     df = df[["category", "message"]].dropna()
-    df["label"] = (df["category"].str.lower() == "spam").astype(int)
+    
+    df["category"] = df["category"].astype(str).str.strip().str.lower()
+    df["message"] = df["message"].astype(str).str.strip()
+    
+    df["label"] = (df["category"] == "spam").astype(int)
 
     df["message_length"] = df["message"].str.len()
     df["word_count"] = df["message"].str.split().str.len()
-
     df["exclamation_count"] = df["message"].str.count("!")
     df["question_count"] = df["message"].str.count(r"\?")
 
@@ -90,7 +103,7 @@ def get_all_models():
                 subsample=0.8,
                 colsample_bytree=0.8,
                 random_state=42,
-                eval_metric="logloss",
+                eval_metric="logloss"
             )
         },
         "Linear SVM": {
@@ -104,6 +117,14 @@ def get_all_models():
                 n_neighbors=5,
                 weights="distance"
                 )
+        },
+        "Simple Neural Network": {
+            "model": MLPClassifier(
+                hidden_layer_sizes=(100, 50),  
+                activation='relu',  
+                max_iter=500,
+                learning_rate_init=0.001
+            )
         },
     }
     return models
