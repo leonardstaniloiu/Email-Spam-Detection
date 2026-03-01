@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier, ExtraTreesClassifier, BaggingClassifier, HistGradientBoostingClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
@@ -23,10 +23,6 @@ def load_data(path: str):
         return pd.DataFrame()
 
     df.columns = [col.strip().lower() for col in df.columns]
-
-    if "category" not in df.columns or "message" not in df.columns:
-        st.error("Dataset-ul trebuie să conțină coloanele 'category' și 'message'!")
-        return pd.DataFrame()
 
     df = df[["category", "message"]].dropna()
     
@@ -71,7 +67,7 @@ def get_all_models():
     models = {
         "Logistic Regression": {
             "model": LogisticRegression(
-                max_iter=1000,
+                max_iter=200,
                 n_jobs=-1)
         },
         "Naive Bayes": {"model": MultinomialNB(alpha=1.0)},
@@ -126,6 +122,29 @@ def get_all_models():
                 learning_rate_init=0.001
             )
         },
+        "AdaBoost": {
+            "model": AdaBoostClassifier(
+                n_estimators=200,
+                learning_rate=1.0,
+                random_state=42
+            )
+        },
+        "Extra Trees": {
+            "model": ExtraTreesClassifier(
+                n_estimators=200,
+                max_depth=15,
+                n_jobs=-1,
+                class_weight="balanced",
+                random_state=42
+            )
+        },
+        "Bagging Classifier": {
+            "model": BaggingClassifier(
+                n_estimators=100,
+                n_jobs=-1,
+                random_state=42
+            )
+        }
     }
     return models
 
@@ -201,3 +220,5 @@ def predict_email(text: str, vectorizer, model):
             pass
 
     return prediction, probability
+
+
