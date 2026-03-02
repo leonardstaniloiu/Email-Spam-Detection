@@ -7,8 +7,6 @@ from datetime import datetime
 
 from spam_service import (
     generate_random_email,
-    load_data,
-    get_all_models,
     train_all_models,
     predict_email,
 )
@@ -81,7 +79,6 @@ def main():
             if email_text.strip():
                 model = results[model_choice]["model"]
                 prediction, probability = predict_email(email_text, vectorizer, model)
-                
                 st.write("---")
                 
                 col1, col2 = st.columns(2)
@@ -100,6 +97,7 @@ def main():
                 
                 with col2:
                     st.write(f"**Model accuracy:** {results[model_choice]['accuracy']:.1%}")
+
             else:
                 st.warning("Write an email text to analyze!")
     
